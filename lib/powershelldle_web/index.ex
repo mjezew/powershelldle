@@ -48,12 +48,8 @@ defmodule PowerShelldleWeb.Index do
 
   @spec mount(map, map, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
-    command = %{
-      name: "Get-ChildItem",
-      description: "Gets the files and folders in a file system drive.",
-      params:
-        "[[-Filter] <String>] [-Attributes {ReadOnly | Hidden | System | Directory | Archive | Device |Normal | Temporary | SparseFile | ReparsePoint | Compressed | Offline | NotContentIndexed | Encrypted |IntegrityStream | NoScrubData}] [-Depth <UInt32>] [-Directory] [-Exclude <String[]>] [-File] [-Force] [-Hidden][-Include <String[]>] -LiteralPath* <String[]> [-Name] [-ReadOnly] [-Recurse] [-System] [-UseTransaction][<CommonParameters>]"
-    }
+    today = Timex.day(Timex.now())
+    command = Commands.get_by_id(today)
 
     changeset = Puzzle.changeset(%Puzzle{}, %{command: command, hints: []})
 
@@ -71,7 +67,14 @@ defmodule PowerShelldleWeb.Index do
         socket
       end
 
-    {:ok, assign(new_socket, changeset: changeset, command: command, error: nil, success: nil)}
+    {:ok,
+     assign(new_socket,
+       changeset: changeset,
+       command: command,
+       error: nil,
+       success: nil,
+       id: today
+     )}
   end
 
   @spec handle_event(String.t(), map, Phoenix.LiveView.Socket.t()) ::
@@ -112,20 +115,17 @@ defmodule PowerShelldleWeb.Index do
   # stored settings for the key.
   def handle_event("restorePuzzle", puzzle_data, socket) when is_binary(puzzle_data) do
     socket =
-      case restore_from_stored(puzzle_data) do
+      case restore_from_stored(puzzle_data, socket) do
         {:ok, nil} ->
           # do nothing with the previous state
           socket
 
         {:ok, restored} ->
-          IO.inspect(restored)
-
           id = restored.id
-          IO.inspect(Commands.commands_by_id()[id])
 
           changeset =
             Puzzle.changeset(%Puzzle{}, %{
-              command: Commands.commands_by_id()[id],
+              command: Commands.get_by_id(id),
               guesses: restored.guesses,
               hints: []
             })
@@ -148,12 +148,12 @@ defmodule PowerShelldleWeb.Index do
     {:noreply, socket}
   end
 
-  defp restore_from_stored(puzzle_data) do
-    IO.inspect(puzzle_data)
+  defp restore_from_stored(puzzle_data, socket) do
+    today = socket.assigns.id
 
     case Jason.decode(puzzle_data) do
       {:ok, %{"id" => id, "guesses" => guesses}} ->
-        if id == 10 do
+        if id == today do
           {:ok, %{guesses: guesses, id: id}}
         else
           {:ok, nil}
@@ -171,7 +171,7 @@ defmodule PowerShelldleWeb.Index do
   end
 
   defp store_state(socket) do
-    id = 10
+    id = socket.assigns.id
     guesses = Ecto.Changeset.get_field(socket.assigns.changeset, :guesses)
 
     socket

@@ -51,14 +51,12 @@ defmodule Puzzle do
 
   defp derive_hints(changeset, command) do
     step = get_field(changeset, :guesses) |> length()
-    hints = get_field(changeset, :hints)
 
     hints =
       case step do
         step when step in [0, 1, 2] -> []
-        3 -> hints ++ [command.params]
-        4 -> hints ++ [command.description]
-        5 -> hints
+        3 -> [command.params]
+        _ -> [command.params, command.description]
       end
 
     put_change(changeset, :hints, hints)
@@ -77,10 +75,8 @@ defmodule Puzzle do
         case step do
           0 -> init_answer(command.name)
           1 -> get_verb(command.name)
-          2 -> get_verb_and_first_letter(command.name)
-          3 -> get_verb_and_first_letter(command.name)
-          4 -> get_verb_and_first_letter(command.name)
           5 -> String.codepoints(command.name)
+          _ -> get_verb_and_first_letter(command.name)
         end
       end
 

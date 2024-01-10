@@ -1984,11 +1984,13 @@ defmodule PowerShelldle.Commands do
     }
   ]
 
+  @amount length(@commands)
   @commands_by_id Enum.with_index(@commands, fn e, i -> {i, e} end) |> Map.new()
 
   @spec commands() :: [command()]
   def commands, do: @commands
 
-  @spec commands_by_id() :: map()
-  def commands_by_id, do: @commands_by_id
+  def get_by_id(id) do
+    @commands_by_id[id]
+  end
 end
