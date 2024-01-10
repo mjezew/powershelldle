@@ -59,12 +59,24 @@ defmodule PowerShelldleWeb.Index do
       ) do
     guesses = Ecto.Changeset.get_field(changeset, :guesses)
 
-    case {correct_answer?(guess, command.name), length(guesses)} do
+    case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
       {true, _guesses} ->
-        {:noreply, assign(socket, success: "YOU WON!!!")}
+        params = Map.put(params, "command", command)
+
+        {:noreply,
+         assign(socket,
+           success: "YOU WON!!!",
+           changeset: Puzzle.changeset(changeset, params)
+         )}
 
       {_invalid, 4} ->
-        {:noreply, assign(socket, error: "YOU LOSE SUCKER!!!")}
+        params = Map.put(params, "command", command)
+
+        {:noreply,
+         assign(socket,
+           error: "YOU LOSE SUCKER!!!",
+           changeset: Puzzle.changeset(changeset, params)
+         )}
 
       _still_playing ->
         params = Map.put(params, "command", command)
@@ -72,7 +84,4 @@ defmodule PowerShelldleWeb.Index do
         {:noreply, assign(socket, changeset: Puzzle.changeset(changeset, params))}
     end
   end
-
-  defp correct_answer?(guess, command_name),
-    do: String.downcase(guess) == String.downcase(command_name)
 end

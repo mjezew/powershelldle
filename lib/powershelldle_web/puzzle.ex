@@ -27,6 +27,11 @@ defmodule Puzzle do
     |> derive_answer(command)
   end
 
+  def correct_answer?(nil, command_name), do: false
+
+  def correct_answer?(guess, command_name),
+    do: String.downcase(guess) == String.downcase(command_name)
+
   defp handle_guesses(changeset) do
     guess = get_field(changeset, :guess) || ""
     guesses = update_guesses(get_field(changeset, :guesses), guess)
@@ -43,20 +48,31 @@ defmodule Puzzle do
         step when step in [0, 1, 2] -> []
         3 -> hints ++ [command.params]
         4 -> hints ++ [command.description]
+        5 -> hints
       end
 
     put_change(changeset, :hints, hints)
   end
 
   defp derive_answer(changeset, command) do
-    step = get_field(changeset, :guesses) |> length()
+    guesses = get_field(changeset, :guesses)
+    step = length(guesses)
+
+    guess = List.first(guesses)
 
     answer =
-      case step do
-        0 -> init_answer(command.name)
-        1 -> get_verb(command.name)
-        2 -> get_verb_and_first_letter(command.name)
-        _other_step -> get_field(changeset, :answer)
+      if correct_answer?(guess, command.name) do
+        String.codepoints(command.name)
+      else
+        get_field(changeset, :answer)
+
+        case step do
+          0 -> init_answer(command.name)
+          1 -> get_verb(command.name)
+          2 -> get_verb_and_first_letter(command.name)
+          5 -> String.codepoints(command.name)
+          _other_step -> get_field(changeset, :answer)
+        end
       end
 
     put_change(changeset, :answer, answer)
