@@ -25,7 +25,13 @@ defmodule PowerShelldleWeb.Index do
         </li>
       </ul>
       <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
-      <button type="submit" disabled={!!@error || !!@success}>Submit guess</button>
+      <button
+        type="submit"
+        disabled={!!@error || !!@success}
+        class="text-center inline-block rounded select-none mt-3 p-2 disabled:pointer-events-none bg-blue-300 hover:bg-blue-500 text-white"
+      >
+        Submit guess
+      </button>
     </.form>
     """
   end
@@ -54,21 +60,16 @@ defmodule PowerShelldleWeb.Index do
 
       user
       |> cast(params, [:guess, :guesses, :hints, :answer])
-      |> handle_guesses(command)
+      |> handle_guesses()
       |> derive_hints(command)
       |> derive_answer(command)
-      |> IO.inspect()
     end
 
-    defp handle_guesses(changeset, command) do
+    defp handle_guesses(changeset) do
       guess = get_field(changeset, :guess) || ""
       guesses = update_guesses(get_field(changeset, :guesses), guess)
 
-      correct? = String.downcase(guess) == String.downcase(command.name)
-
-      changeset
-      |> put_change(:guesses, guesses)
-      |> maybe_add_error(correct?)
+      put_change(changeset, :guesses, guesses)
     end
 
     defp derive_hints(changeset, command) do
@@ -110,9 +111,6 @@ defmodule PowerShelldleWeb.Index do
     defp update_guesses(nil, guess), do: [guess]
     defp update_guesses(guesses, guess), do: [guess | guesses]
 
-    defp maybe_add_error(changeset, false), do: add_error(changeset, :guess, "invalid")
-    defp maybe_add_error(changeset, true), do: changeset
-
     defp get_verb(command_name) do
       [verb, noun] = String.split(command_name, "-")
       noun = String.codepoints(noun)
@@ -150,29 +148,25 @@ defmodule PowerShelldleWeb.Index do
           {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event(
         "submit_guess",
-        params,
+        %{"power_shelldle" => %{"guess" => guess} = params},
         %{assigns: %{command: command, changeset: changeset}} = socket
       ) do
     guesses = Ecto.Changeset.get_field(changeset, :guesses)
 
-    case {changeset.valid?, length(guesses)} do
+    case {correct_answer?(guess, command.name), length(guesses)} do
       {true, _guesses} ->
         {:noreply, assign(socket, success: "YOU WON!!!")}
 
       {_invalid, 4} ->
         {:noreply, assign(socket, error: "YOU LOSE!")}
 
-      _ ->
-        params =
-          params["power_shelldle"]
-          |> Map.put("hints", Ecto.Changeset.get_field(changeset, :hints))
-          |> Map.put("command", command)
-          |> Map.put("guesses", guesses)
-          |> Map.put("answer", Ecto.Changeset.get_field(changeset, :answer))
+      _still_playing ->
+        params = Map.put(params, "command", command)
 
-        changeset = PowerShelldle.changeset(%PowerShelldle{}, params)
-
-        {:noreply, assign(socket, changeset: changeset)}
+        {:noreply, assign(socket, changeset: PowerShelldle.changeset(changeset, params))}
     end
   end
+
+  defp correct_answer?(guess, command_name),
+    do: String.downcase(guess) == String.downcase(command_name)
 end
