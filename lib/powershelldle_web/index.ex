@@ -16,14 +16,22 @@ defmodule PowerShelldleWeb.Index do
           <%= answer_char %>
         </div>
       </div>
-      <ul>
-        <li :for={hint <- Ecto.Changeset.get_field(@changeset, :hints)}>
-          <div :if={not is_nil(hint)}>
-            <p>Hint:</p>
-            <p><%= hint %></p>
-          </div>
-        </li>
-      </ul>
+      <div :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> List.first() |> is_nil())}>
+        <ul>
+          <li>
+            <div>
+              <p>Parameters:</p>
+              <code><%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %></code>
+            </div>
+          </li>
+          <li>
+            <div :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) |> is_nil())}>
+              <p>Description:</p>
+              <p><%= Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) %></p>
+            </div>
+          </li>
+        </ul>
+      </div>
       <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
       <button
         type="submit"

@@ -27,7 +27,7 @@ defmodule Puzzle do
     |> derive_answer(command)
   end
 
-  def correct_answer?(nil, command_name), do: false
+  def correct_answer?(nil, _command_name), do: false
 
   def correct_answer?(guess, command_name),
     do: String.downcase(guess) == String.downcase(command_name)
