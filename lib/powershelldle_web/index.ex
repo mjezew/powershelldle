@@ -9,10 +9,7 @@ defmodule PowerShelldleWeb.Index do
   @spec render(map) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-    <h1>Daily PowerShelldle</h1>
     <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
-      <h2 :if={@error} class="error"><%= @error %></h2>
-      <h2 :if={@success}><%= @success %></h2>
       <div class="flex flex-row">
         <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-1">
           <%= answer_char %>
@@ -34,14 +31,18 @@ defmodule PowerShelldleWeb.Index do
           </li>
         </ul>
       </div>
-      <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
-      <button
-        type="submit"
-        disabled={!!@error || !!@success}
-        class="text-center inline-block rounded select-none mt-3 p-2 disabled:pointer-events-none bg-blue-300 hover:bg-blue-500 text-white"
-      >
-        Submit guess
-      </button>
+      <h2 :if={@error} class="text-zinc-500"><%= @error %></h2>
+      <h2 :if={@success}><%= @success %></h2>
+      <div :if={!@error and !@success}>
+        <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
+        <button
+          type="submit"
+          disabled={!!@error || !!@success}
+          class="text-center inline-block rounded select-none mt-3 p-2 disabled:pointer-events-none bg-blue-300 hover:bg-blue-500 text-white"
+        >
+          Submit guess
+        </button>
+      </div>
     </.form>
     """
   end
