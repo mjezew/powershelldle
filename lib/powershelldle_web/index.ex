@@ -2,13 +2,15 @@ defmodule PowerShelldleWeb.Index do
   use PowerShelldleWeb, :live_view
   import Phoenix.Component
 
+  alias PowerShelldle.Commands
+
   require Logger
 
   @spec render(map) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <h1>Daily PowerShelldle</h1>
-    <.form :let={f} for={@changeset} phx-submit="submit_guess">
+    <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
       <h2 :if={@error} class="error"><%= @error %></h2>
       <h2 :if={@success}><%= @success %></h2>
       <div class="flex flex-row">
@@ -55,7 +57,21 @@ defmodule PowerShelldleWeb.Index do
 
     changeset = Puzzle.changeset(%Puzzle{}, %{command: command, hints: []})
 
-    {:ok, assign(socket, changeset: changeset, command: command, error: nil, success: nil)}
+    # Only try to talk to the client when the websocket
+    # is setup. Not on the initial "static" render.
+    new_socket =
+      if connected?(socket) do
+        storage_key = "powershelldle"
+
+        socket
+        |> assign(:storage_key, storage_key)
+        # request the browser to restore any state it has for this key.
+        |> push_event("restore", %{key: storage_key, event: "restorePuzzle"})
+      else
+        socket
+      end
+
+    {:ok, assign(new_socket, changeset: changeset, command: command, error: nil, success: nil)}
   end
 
   @spec handle_event(String.t(), map, Phoenix.LiveView.Socket.t()) ::
@@ -67,29 +83,101 @@ defmodule PowerShelldleWeb.Index do
       ) do
     guesses = Ecto.Changeset.get_field(changeset, :guesses)
 
-    case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
-      {true, _guesses} ->
-        params = Map.put(params, "command", command)
+    params = Map.put(params, "command", command)
+    changeset = Puzzle.changeset(changeset, params)
 
-        {:noreply,
-         assign(socket,
-           success: "YOU WON!!!",
-           changeset: Puzzle.changeset(changeset, params)
-         )}
+    socket =
+      case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
+        {true, _guesses} ->
+          assign(socket,
+            success: "YOU WON!!!",
+            changeset: changeset
+          )
 
-      {_invalid, 4} ->
-        params = Map.put(params, "command", command)
+        {_invalid, 4} ->
+          assign(socket,
+            error: "YOU LOSE SUCKER!!!",
+            changeset: changeset
+          )
 
-        {:noreply,
-         assign(socket,
-           error: "YOU LOSE SUCKER!!!",
-           changeset: Puzzle.changeset(changeset, params)
-         )}
+        _still_playing ->
+          assign(socket, changeset: changeset)
+      end
+      |> store_state()
 
-      _still_playing ->
-        params = Map.put(params, "command", command)
+    {:noreply, socket}
+  end
 
-        {:noreply, assign(socket, changeset: Puzzle.changeset(changeset, params))}
+  # Pushed from JS hook. Server requests it to send up any
+  # stored settings for the key.
+  def handle_event("restorePuzzle", puzzle_data, socket) when is_binary(puzzle_data) do
+    socket =
+      case restore_from_stored(puzzle_data) do
+        {:ok, nil} ->
+          # do nothing with the previous state
+          socket
+
+        {:ok, restored} ->
+          IO.inspect(restored)
+
+          id = restored.id
+          IO.inspect(Commands.commands_by_id()[id])
+
+          changeset =
+            Puzzle.changeset(%Puzzle{}, %{
+              command: Commands.commands_by_id()[id],
+              guesses: restored.guesses,
+              hints: []
+            })
+
+          assign(socket, changeset: changeset)
+
+        {:error, reason} ->
+          # We don't continue checking. Display error.
+          # Clear the token so it doesn't keep showing an error.
+          socket
+          |> clear_browser_storage()
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("restorePuzzle", _token_data, socket) do
+    # No expected token data received from the client
+    Logger.debug("No LiveView SessionStorage state to restore")
+    {:noreply, socket}
+  end
+
+  defp restore_from_stored(puzzle_data) do
+    IO.inspect(puzzle_data)
+
+    case Jason.decode(puzzle_data) do
+      {:ok, %{"id" => id, "guesses" => guesses}} ->
+        if id == 10 do
+          {:ok, %{guesses: guesses, id: id}}
+        else
+          {:ok, nil}
+        end
+
+      {:error, reason} ->
+        {:error, "Unable to decode stored state: #{inspect(reason)}"}
     end
+  end
+
+  # Push a websocket event down to the browser's JS hook.
+  # Clear any settings for the current my_storage_key.
+  defp clear_browser_storage(socket) do
+    push_event(socket, "clear", %{key: socket.assigns.storage_key})
+  end
+
+  defp store_state(socket) do
+    id = 10
+    guesses = Ecto.Changeset.get_field(socket.assigns.changeset, :guesses)
+
+    socket
+    |> push_event(
+      "store",
+      %{key: socket.assigns.storage_key, data: Jason.encode!(%{id: id, guesses: guesses})}
+    )
   end
 end

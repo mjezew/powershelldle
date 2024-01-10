@@ -33,10 +33,20 @@ defmodule Puzzle do
     do: String.downcase(guess) == String.downcase(command_name)
 
   defp handle_guesses(changeset) do
-    guess = get_field(changeset, :guess) || ""
-    guesses = update_guesses(get_field(changeset, :guesses), guess)
+    guess = get_field(changeset, :guess)
+    guesses = get_field(changeset, :guesses)
 
-    put_change(changeset, :guesses, guesses)
+    cond do
+      is_nil(guess) and not is_nil(guesses) and not Enum.empty?(guesses) ->
+        changeset
+
+      is_nil(guess) ->
+        put_change(changeset, :guesses, [])
+
+      true ->
+        guesses = update_guesses(get_field(changeset, :guesses), guess)
+        put_change(changeset, :guesses, guesses)
+    end
   end
 
   defp derive_hints(changeset, command) do
@@ -56,7 +66,7 @@ defmodule Puzzle do
 
   defp derive_answer(changeset, command) do
     guesses = get_field(changeset, :guesses)
-    step = length(guesses)
+    step = length(guesses) |> IO.inspect()
 
     guess = List.first(guesses)
 
@@ -64,14 +74,13 @@ defmodule Puzzle do
       if correct_answer?(guess, command.name) do
         String.codepoints(command.name)
       else
-        get_field(changeset, :answer)
-
         case step do
           0 -> init_answer(command.name)
           1 -> get_verb(command.name)
           2 -> get_verb_and_first_letter(command.name)
+          3 -> get_verb_and_first_letter(command.name)
+          4 -> get_verb_and_first_letter(command.name)
           5 -> String.codepoints(command.name)
-          _other_step -> get_field(changeset, :answer)
         end
       end
 
