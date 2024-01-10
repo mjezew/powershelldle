@@ -17,7 +17,7 @@ defmodule PowerShelldleWeb.Router do
   scope "/", PowerShelldleWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", Index
   end
 
   # Other scopes may use custom stacks.

@@ -11,7 +11,7 @@ defmodule PowerShelldle.Application do
       # Start the Telemetry supervisor
       PowerShelldleWeb.Telemetry,
       # Start the Ecto repository
-      PowerShelldle.Repo,
+      # PowerShelldle.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: PowerShelldle.PubSub},
       # Start Finch
