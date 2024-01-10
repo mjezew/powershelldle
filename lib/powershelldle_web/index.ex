@@ -120,19 +120,17 @@ defmodule PowerShelldleWeb.Index do
           # do nothing with the previous state
           socket
 
-        {:ok, restored} ->
-          id = restored.id
-
+        {:ok, %{id: id, guesses: guesses, error: error, success: success}} ->
           changeset =
             Puzzle.changeset(%Puzzle{}, %{
               command: Commands.get_by_id(id),
-              guesses: restored.guesses,
+              guesses: guesses,
               hints: []
             })
 
-          assign(socket, changeset: changeset)
+          assign(socket, changeset: changeset, error: error, success: success)
 
-        {:error, reason} ->
+        {:error, _reason} ->
           # We don't continue checking. Display error.
           # Clear the token so it doesn't keep showing an error.
           socket
@@ -152,12 +150,15 @@ defmodule PowerShelldleWeb.Index do
     today = socket.assigns.id
 
     case Jason.decode(puzzle_data) do
-      {:ok, %{"id" => id, "guesses" => guesses}} ->
+      {:ok, %{"id" => id, "guesses" => guesses, "success" => success, "error" => error}} ->
         if id == today do
-          {:ok, %{guesses: guesses, id: id}}
+          {:ok, %{guesses: guesses, id: id, success: success, error: error}}
         else
           {:ok, nil}
         end
+
+      {:ok, _} ->
+        {:ok, nil}
 
       {:error, reason} ->
         {:error, "Unable to decode stored state: #{inspect(reason)}"}
@@ -172,12 +173,17 @@ defmodule PowerShelldleWeb.Index do
 
   defp store_state(socket) do
     id = socket.assigns.id
+    success = socket.assigns.success
+    error = socket.assigns.error
     guesses = Ecto.Changeset.get_field(socket.assigns.changeset, :guesses)
 
     socket
     |> push_event(
       "store",
-      %{key: socket.assigns.storage_key, data: Jason.encode!(%{id: id, guesses: guesses})}
+      %{
+        key: socket.assigns.storage_key,
+        data: Jason.encode!(%{id: id, guesses: guesses, error: error, success: success})
+      }
     )
   end
 end
