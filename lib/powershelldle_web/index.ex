@@ -20,7 +20,7 @@ defmodule PowerShelldleWeb.Index do
           <li>
             <div class="mt-2">
               <p class="font-bold text-zinc-300">Parameters:</p>
-              <div class="bg-zinc-600 rounded">
+              <div class="bg-zinc-600 rounded p-2">
                 <code>
                   <%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %>
                 </code>

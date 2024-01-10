@@ -8,8 +8,7 @@
 import Config
 
 config :powershelldle,
-  namespace: PowerShelldle,
-  ecto_repos: [PowerShelldle.Repo]
+  namespace: PowerShelldle
 
 # Configures the endpoint
 config :powershelldle, PowerShelldleWeb.Endpoint,

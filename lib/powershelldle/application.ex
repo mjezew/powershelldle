@@ -10,8 +10,6 @@ defmodule PowerShelldle.Application do
     children = [
       # Start the Telemetry supervisor
       PowerShelldleWeb.Telemetry,
-      # Start the Ecto repository
-      # PowerShelldle.Repo,
       # Start the PubSub system
       {Phoenix.PubSub, name: PowerShelldle.PubSub},
       # Start Finch
