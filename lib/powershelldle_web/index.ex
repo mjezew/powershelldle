@@ -18,27 +18,37 @@ defmodule PowerShelldleWeb.Index do
       <div :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> List.first() |> is_nil())}>
         <ul>
           <li>
-            <div>
-              <p>Parameters:</p>
-              <code><%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %></code>
+            <div class="mt-2">
+              <p class="font-bold text-zinc-300">Parameters:</p>
+              <div class="bg-zinc-600 rounded">
+                <code>
+                  <%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %>
+                </code>
+              </div>
             </div>
           </li>
           <li>
-            <div :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) |> is_nil())}>
-              <p>Description:</p>
+            <div
+              :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) |> is_nil())}
+              class="mt-2"
+            >
+              <p class="font-bold text-zinc-300">Description:</p>
               <p><%= Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) %></p>
             </div>
           </li>
         </ul>
       </div>
-      <h2 :if={@error} class="text-zinc-500"><%= @error %></h2>
-      <h2 :if={@success}><%= @success %></h2>
+      <div :if={!!@error || @success} class="mt-4">
+        <p :if={@error} class="text-red-700"><%= @error %></p>
+        <p :if={@success} class="text-green-700"><%= @success %></p>
+        <p>Come back tomorrow for a new puzzle!</p>
+      </div>
       <div :if={!@error and !@success}>
-        <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
+        <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} class="bg-zinc-200" />
         <button
           type="submit"
           disabled={!!@error || !!@success}
-          class="text-center inline-block rounded select-none mt-3 p-2 disabled:pointer-events-none bg-blue-300 hover:bg-blue-500 text-white"
+          class="text-center inline-block rounded select-none mt-3 p-2 disabled:pointer-events-none bg-blue-900 hover:bg-blue-950 text-white"
         >
           Submit guess
         </button>
