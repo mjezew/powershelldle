@@ -93,6 +93,12 @@ defmodule PowerShelldleWeb.Index do
     socket =
       case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
         {true, _guesses} ->
+          full_guesses =
+            guesses |> Stream.concat(Stream.repeatedly(fn -> guess end)) |> Enum.take(5)
+
+          params = Map.put(params, "guesses", full_guesses) |> Map.delete("guess")
+          changeset = Puzzle.changeset(changeset, params)
+
           assign(socket,
             success: "YOU WON!!!",
             changeset: changeset

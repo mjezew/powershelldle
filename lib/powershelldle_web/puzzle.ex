@@ -64,7 +64,7 @@ defmodule Puzzle do
 
   defp derive_answer(changeset, command) do
     guesses = get_field(changeset, :guesses)
-    step = length(guesses) |> IO.inspect()
+    step = length(guesses)
 
     guess = List.first(guesses)
 
