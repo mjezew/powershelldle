@@ -185,9 +185,6 @@ defmodule PowerShelldleWeb.Index do
       ) do
     guesses = Ecto.Changeset.get_field(changeset, :guesses)
 
-    params = Map.put(params, "command", command)
-    changeset = Puzzle.changeset(changeset, params)
-
     if guess in guesses do
       socket =
         assign(socket,
@@ -197,6 +194,9 @@ defmodule PowerShelldleWeb.Index do
 
       {:noreply, socket}
     else
+      params = Map.put(params, "command", command)
+      changeset = Puzzle.changeset(changeset, params)
+
       socket =
         case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
           {true, _guesses} ->
