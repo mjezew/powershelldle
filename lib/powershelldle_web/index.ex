@@ -46,6 +46,8 @@ defmodule PowerShelldleWeb.Index do
       <p class="text-[#3672c0] mb-2">
         Remaining guesses: <%= 5 - @index %>
       </p>
+    </div>
+    <div class="mb-6">
       <div><.ps_label />Write-Host "Puzzle: $puzzle"</div>
       <div class="flex flex-row items-center " id="puzzle">
         <p class="whitespace-nowrap pr-3">Puzzle:</p>
@@ -70,6 +72,8 @@ defmodule PowerShelldleWeb.Index do
         }
         answer={Ecto.Changeset.get_field(@changeset, :answers) |> Enum.at(-2)}
       />
+    </div>
+    <div class="mb-6">
       <.ps_label />Read-Host -Prompt "Guess" -OutVariable guess
       <div class="flex flex-row items-center">
         <label for="guess">Guess:</label>
@@ -94,7 +98,7 @@ defmodule PowerShelldleWeb.Index do
       }>
         <.puzzle_block_history changeset={@changeset} index={i} guess={guess} />
       </div>
-      <div :if={!!@error || !!@success} class="mt-4">
+      <div :if={!!@error || !!@success}>
         <.hints
           :if={Ecto.Changeset.get_field(@changeset, :guesses) |> Enum.uniq() |> length() < 5}
           hints={Ecto.Changeset.get_field(@changeset, :hints)}
