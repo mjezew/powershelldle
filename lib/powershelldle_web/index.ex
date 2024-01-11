@@ -9,6 +9,14 @@ defmodule PowerShelldleWeb.Index do
   defp hints(assigns) do
     ~H"""
     <div :if={not (@hints |> List.first() |> is_nil())}>
+      <div class="flex flex-row flex-wrap items-center">
+        <.ps_label />
+        <p class="whitespace-nowrap pr-3">Get-Help</p>
+
+        <div :for={answer_char <- @answer}>
+          <%= answer_char %>
+        </div>
+      </div>
       <ul>
         <li>
           <div :if={not (@hints |> Enum.at(1) |> is_nil())} class="mt-2">
@@ -54,11 +62,14 @@ defmodule PowerShelldleWeb.Index do
           </div>
         </div>
       </div>
-      <.hints hints={
-        if @index <= 2,
-          do: [],
-          else: Ecto.Changeset.get_field(@changeset, :hints) |> Enum.slice(0, @index - 2)
-      } />
+      <.hints
+        hints={
+          if @index <= 2,
+            do: [],
+            else: Ecto.Changeset.get_field(@changeset, :hints) |> Enum.slice(0, @index - 2)
+        }
+        answer={Ecto.Changeset.get_field(@changeset, :answers) |> Enum.at(-2)}
+      />
       <.ps_label />Read-Host -Prompt "Guess" -OutVariable guess
       <div class="flex flex-row items-center">
         <label for="guess">Guess:</label>
@@ -87,6 +98,7 @@ defmodule PowerShelldleWeb.Index do
         <.hints
           :if={Ecto.Changeset.get_field(@changeset, :guesses) |> Enum.uniq() |> length() < 5}
           hints={Ecto.Changeset.get_field(@changeset, :hints)}
+          answer={Ecto.Changeset.get_field(@changeset, :answers) |> List.last()}
         />
         <div :if={@error}><.ps_label />Write-Host "<%= @error %>" -ForegroundColor Red</div>
         <p :if={@error} class="text-red-700 mb-6"><%= @error %></p>
@@ -112,7 +124,10 @@ defmodule PowerShelldleWeb.Index do
             </div>
           </div>
         </div>
-        <.hints hints={Ecto.Changeset.get_field(@changeset, :hints)} />
+        <.hints
+          hints={Ecto.Changeset.get_field(@changeset, :hints)}
+          answer={Ecto.Changeset.get_field(@changeset, :answers) |> List.last()}
+        />
         <.ps_label />Read-Host -Prompt "Guess" -OutVariable guess
         <div class="flex flex-row items-center">
           <label for="guess">Guess:</label>
