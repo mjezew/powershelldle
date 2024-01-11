@@ -93,7 +93,7 @@ defmodule Puzzle do
       end
       |> then(fn answers ->
         if correct_answer?(guess, command.name) do
-          answers ++ String.codepoints(command.name)
+          answers ++ [String.codepoints(command.name)]
         else
           answers
         end

@@ -195,7 +195,6 @@ defmodule PowerShelldleWeb.Index do
       {:noreply, socket}
     else
       params = Map.put(params, "command", command)
-      changeset = Puzzle.changeset(changeset, params)
 
       socket =
         case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
@@ -212,7 +211,9 @@ defmodule PowerShelldleWeb.Index do
               form_error: nil
             )
 
-          {_invalid, 4} ->
+          {_invalid, x} when x > 3 ->
+            changeset = Puzzle.changeset(changeset, params)
+
             assign(socket,
               error: "YOU LOSE SUCKER!!!",
               changeset: changeset,
@@ -220,6 +221,7 @@ defmodule PowerShelldleWeb.Index do
             )
 
           _still_playing ->
+            changeset = Puzzle.changeset(changeset, params)
             assign(socket, changeset: changeset, form_error: nil)
         end
         |> store_state()
