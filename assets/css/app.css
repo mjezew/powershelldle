@@ -7,3 +7,12 @@
 html {
   font-family: "IBM Plex Mono", monospace;
 }
+
+[type="text"]:focus {
+  outline-offset: 0px;
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: rgb(113 113 122);
+  --tw-ring-color: transparent;
+}

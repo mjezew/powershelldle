@@ -31,7 +31,7 @@ defmodule PowerShelldleWeb.Index do
               class="mt-2"
             >
               <p class="font-bold text-zinc-300">SYNOPSIS</p>
-              <p class="mb-6 ml-10">
+              <p class="mb-6 ml-10 typewriter">
                 <%= Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) %>
               </p>
             </div>
@@ -39,17 +39,23 @@ defmodule PowerShelldleWeb.Index do
           <li>
             <div class="mt-2">
               <p class="font-bold text-zinc-300">SYNTAX</p>
-              <p class="mb-6 ml-10">
+              <p class="mb-6 ml-10 typewriter">
                 <%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %>
               </p>
             </div>
           </li>
         </ul>
       </div>
+      <div>
+        <.ps_label />Write-Host "Puzzle: $puzzle"
+      </div>
       <div class="flex flex-row items-center">
         <.ps_label />
-        <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5 ">
-          <%= answer_char %>
+        <p class="whitespace-nowrap pr-3">Puzzle:</p>
+        <div class="ml-28 flex flex-row items-center">
+          <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5">
+            <%= answer_char %>
+          </div>
         </div>
       </div>
       <div :if={!!@error || @success} class="mt-4">
@@ -60,8 +66,10 @@ defmodule PowerShelldleWeb.Index do
         <div><.ps_label />Write-Host "Come back tomorrow for a new puzzle!"</div>
         <p>Come back tomorrow for a new puzzle!</p>
       </div>
-      <div :if={!@error and !@success}>
-        <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
+      <div :if={!@error and !@success} class="relative">
+        <.ps_label />Read-Host -Prompt "Enter your guess" -OutVariable guess
+        <label for="guess" class="absolute top-8 left-20">Enter your guess:</label>
+        <.input type="text" id="guess" field={f[:guess]} disabled={!!@error || !!@success} />
       </div>
     </.form>
     """
@@ -114,7 +122,7 @@ defmodule PowerShelldleWeb.Index do
       case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
         {true, _guesses} ->
           full_guesses =
-            guesses |> Stream.concat(Stream.repeatedly(fn -> guess end)) |> Enum.take(5)
+            guesses |> Stream.concat(Stream.repeatedly(fn -> guess end)) |> Enum.take(4)
 
           params = Map.put(params, "guesses", full_guesses) |> Map.delete("guess")
           changeset = Puzzle.changeset(changeset, params)
