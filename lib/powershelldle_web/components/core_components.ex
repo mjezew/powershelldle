@@ -337,22 +337,36 @@ defmodule PowerShelldleWeb.CoreComponents do
   def input(assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
-      <input
-        type={@type}
-        name={@name}
-        id={@id}
-        value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
-          "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
-        ]}
-        {@rest}
-      />
+      <div class="flex flex-column">
+        <.ps_label for={@id} />
+        <input
+          type={@type}
+          name={@name}
+          id={@id}
+          value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+          class={[
+            "grow text-zinc-300 bg-transparent border-none focus:ring-0 tracking-[.125em] px-0",
+            @errors != [] && "border-rose-400 focus:border-rose-400"
+          ]}
+          autocomplete="off"
+          spellcheck="false"
+          autofocus
+          {@rest}
+        />
+      </div>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
+    """
+  end
+
+  @doc """
+  Renders a powershell label (PS C:\>).
+  """
+  attr :for, :string, default: nil
+
+  def ps_label(assigns) do
+    ~H"""
+    <label for={@for} class="py-2 pr-3 text-zinc-400 bg-transparent whitespace-nowrap">PS C:\></label>
     """
   end
 

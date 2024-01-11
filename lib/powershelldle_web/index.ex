@@ -10,48 +10,58 @@ defmodule PowerShelldleWeb.Index do
   def render(assigns) do
     ~H"""
     <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
-      <div class="flex flex-row">
-        <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-1">
-          <%= answer_char %>
-        </div>
-      </div>
+      <div><.ps_label />Write-Host "Remaining guesses: $i" -ForegroundColor DarkBlue</div>
+      <p class="text-[#3672c0]">
+        Remaining guesses: <%= 5 - (Ecto.Changeset.get_field(@changeset, :guesses, 5) |> length) %>
+      </p>
+
       <div :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> List.first() |> is_nil())}>
+        <div class="flex flex-row flex-wrap items-center">
+          <.ps_label />
+          <p class="whitespace-nowrap pr-3">Get-Help</p>
+
+          <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}>
+            <%= answer_char %>
+          </div>
+        </div>
         <ul>
-          <li>
-            <div class="mt-2">
-              <p class="font-bold text-zinc-300">Parameters:</p>
-              <div class="bg-zinc-600 rounded p-2">
-                <code>
-                  <%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %>
-                </code>
-              </div>
-            </div>
-          </li>
           <li>
             <div
               :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) |> is_nil())}
               class="mt-2"
             >
-              <p class="font-bold text-zinc-300">Description:</p>
-              <p><%= Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) %></p>
+              <p class="font-bold text-zinc-300">SYNOPSIS</p>
+              <p class="mb-6 ml-10">
+                <%= Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) %>
+              </p>
+            </div>
+          </li>
+          <li>
+            <div class="mt-2">
+              <p class="font-bold text-zinc-300">SYNTAX</p>
+              <p class="mb-6 ml-10">
+                <%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %>
+              </p>
             </div>
           </li>
         </ul>
       </div>
+      <div class="flex flex-row items-center">
+        <.ps_label />
+        <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5 ">
+          <%= answer_char %>
+        </div>
+      </div>
       <div :if={!!@error || @success} class="mt-4">
-        <p :if={@error} class="text-red-700"><%= @error %></p>
-        <p :if={@success} class="text-green-700"><%= @success %></p>
+        <div :if={@error}><.ps_label />Write-Host "<%= @error %>" -ForegroundColor Red</div>
+        <p :if={@error} class="text-red-700 mb-6"><%= @error %></p>
+        <div :if={@success}><.ps_label />Write-Host "<%= @success %>" -ForegroundColor Green</div>
+        <p :if={@success} class="text-green-700 mb-6"><%= @success %></p>
+        <div><.ps_label />Write-Host "Come back tomorrow for a new puzzle!"</div>
         <p>Come back tomorrow for a new puzzle!</p>
       </div>
       <div :if={!@error and !@success}>
-        <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} class="bg-zinc-200" />
-        <button
-          type="submit"
-          disabled={!!@error || !!@success}
-          class="text-center inline-block rounded select-none mt-3 p-2 disabled:pointer-events-none bg-blue-900 hover:bg-blue-950 text-white"
-        >
-          Submit guess
-        </button>
+        <.input type="text" field={f[:guess]} disabled={!!@error || !!@success} />
       </div>
     </.form>
     """
