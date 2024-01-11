@@ -50,8 +50,7 @@ defmodule PowerShelldleWeb.Index do
         <.ps_label />Write-Host "Puzzle: $puzzle"
       </div>
       <div class="flex flex-row items-center">
-        <.ps_label />
-        <p class="whitespace-nowrap pr-3">Puzzle:</p>
+        <p class="whitespace-nowrap pr-3 ml-20">Puzzle:</p>
         <div class="ml-28 flex flex-row items-center">
           <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5">
             <%= answer_char %>
@@ -68,8 +67,10 @@ defmodule PowerShelldleWeb.Index do
       </div>
       <div :if={!@error and !@success} class="relative">
         <.ps_label />Read-Host -Prompt "Enter your guess" -OutVariable guess
-        <label for="guess" class="absolute top-8 left-20">Enter your guess:</label>
-        <.input type="text" id="guess" field={f[:guess]} disabled={!!@error || !!@success} />
+        <div class="ml-20">
+          <label for="guess" class="absolute top-8 left-20">Enter your guess:</label>
+          <.input type="text" id="guess" field={f[:guess]} disabled={!!@error || !!@success} />
+        </div>
       </div>
     </.form>
     """

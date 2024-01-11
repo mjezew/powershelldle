@@ -338,14 +338,13 @@ defmodule PowerShelldleWeb.CoreComponents do
     ~H"""
     <div phx-feedback-for={@name}>
       <div class="flex flex-column">
-        <.ps_label for={@id} />
         <input
           type={@type}
           name={@name}
           id={@id}
           value={Phoenix.HTML.Form.normalize_value(@type, @value)}
           class={[
-            "grow text-zinc-300 bg-transparent border-x-zinc-900 border-t-zinc-900 border-b-zinc-700 tracking-[.125em] mr-0 ml-44"
+            "grow text-zinc-300 bg-transparent border-x-zinc-900 border-t-zinc-900 border-b-zinc-700 tracking-[.125em] mr-8 ml-44"
           ]}
           autocomplete="off"
           spellcheck="false"
