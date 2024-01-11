@@ -11,7 +11,7 @@ defmodule PowerShelldleWeb.Index do
     ~H"""
     <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
       <div><.ps_label />Write-Host "Remaining guesses: $i" -ForegroundColor DarkBlue</div>
-      <p class="text-[#3672c0]">
+      <p class="text-[#3672c0] mb-2">
         Remaining guesses: <%= 5 - (Ecto.Changeset.get_field(@changeset, :guesses, 5) |> length) %>
       </p>
 
@@ -46,12 +46,10 @@ defmodule PowerShelldleWeb.Index do
           </li>
         </ul>
       </div>
-      <div>
-        <.ps_label />Write-Host "Puzzle: $puzzle"
-      </div>
-      <div class="flex flex-row items-center">
-        <p class="whitespace-nowrap pr-3 ml-20">Puzzle:</p>
-        <div class="ml-28 flex flex-row items-center">
+      <div><.ps_label />Write-Host "Puzzle: $puzzle"</div>
+      <div class="flex flex-row items-center mb-6">
+        <p class="whitespace-nowrap pr-3">Puzzle:</p>
+        <div class="flex flex-row items-center">
           <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5">
             <%= answer_char %>
           </div>
@@ -65,10 +63,11 @@ defmodule PowerShelldleWeb.Index do
         <div><.ps_label />Write-Host "Come back tomorrow for a new puzzle!"</div>
         <p>Come back tomorrow for a new puzzle!</p>
       </div>
-      <div :if={!@error and !@success} class="relative">
-        <.ps_label />Read-Host -Prompt "Enter your guess" -OutVariable guess
-        <div class="ml-20">
-          <label for="guess" class="absolute top-8 left-20">Enter your guess:</label>
+      <div :if={!@error and !@success}>
+        <.ps_label />Read-Host -Prompt "Guess" -OutVariable guess
+        <div class="flex flex-row items-center">
+          <label for="guess">Guess:</label>
+
           <.input type="text" id="guess" field={f[:guess]} disabled={!!@error || !!@success} />
         </div>
       </div>

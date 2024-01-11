@@ -1,18 +1,20 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* This file is for your main application CSS */
 
 html {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
-[type="text"]:focus {
-  outline-offset: 0px;
-  border-top-color: transparent;
-  border-left-color: transparent;
-  border-right-color: transparent;
-  border-bottom-color: rgb(113 113 122);
-  --tw-ring-color: transparent;
+.separated-input {
+  letter-spacing: 0.125em;
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) calc(0.75em - 1.5px),
+    rgb(113 113 122) 0.75em
+  );
+  background-size: 0.75em 100%;
+  padding-left: 0.125em;
 }
