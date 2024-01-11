@@ -45,7 +45,7 @@ defmodule PowerShelldleWeb.Index do
           <div
             :for={
               answer_char <-
-                IO.inspect(Ecto.Changeset.get_field(@changeset, :answers), label: "in history")
+                Ecto.Changeset.get_field(@changeset, :answers)
                 |> Enum.at(min(@index, 2))
             }
             class="mr-0.5"
@@ -78,11 +78,16 @@ defmodule PowerShelldleWeb.Index do
       <div :for={
         {guess, i} <-
           Ecto.Changeset.get_field(@changeset, :guesses)
+          |> Enum.uniq()
           |> Enum.with_index()
       }>
         <.puzzle_block_history changeset={@changeset} index={i} guess={guess} />
       </div>
       <div :if={!!@error || !!@success} class="mt-4">
+        <.hints
+          :if={Ecto.Changeset.get_field(@changeset, :guesses) |> Enum.uniq() |> length() < 5}
+          hints={Ecto.Changeset.get_field(@changeset, :hints)}
+        />
         <div :if={@error}><.ps_label />Write-Host "<%= @error %>" -ForegroundColor Red</div>
         <p :if={@error} class="text-red-700 mb-6"><%= @error %></p>
         <div :if={@success}><.ps_label />Write-Host "<%= @success %>" -ForegroundColor Green</div>
@@ -114,6 +119,7 @@ defmodule PowerShelldleWeb.Index do
 
           <.input type="text" id="guess" field={f[:guess]} disabled={!!@error || !!@success} />
         </div>
+        <p :if={!!@form_error} class="text-red-700 mb-6"><%= @form_error %></p>
       </div>
     </.form>
     """
@@ -146,7 +152,8 @@ defmodule PowerShelldleWeb.Index do
        command: command,
        error: nil,
        success: nil,
-       id: today
+       id: today,
+       form_error: nil
      )}
   end
 
@@ -162,33 +169,44 @@ defmodule PowerShelldleWeb.Index do
     params = Map.put(params, "command", command)
     changeset = Puzzle.changeset(changeset, params)
 
-    socket =
-      case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
-        {true, _guesses} ->
-          full_guesses =
-            guesses |> Stream.concat(Stream.repeatedly(fn -> guess end)) |> Enum.take(4)
+    if guess in guesses do
+      socket =
+        assign(socket,
+          form_error: "You already guessed #{guess}!",
+          changeset: changeset
+        )
 
-          params = Map.put(params, "guesses", full_guesses) |> Map.delete("guess")
-          changeset = Puzzle.changeset(changeset, params)
+      {:noreply, socket}
+    else
+      socket =
+        case {Puzzle.correct_answer?(guess, command.name), length(guesses)} do
+          {true, _guesses} ->
+            full_guesses =
+              guesses |> Stream.concat(Stream.repeatedly(fn -> guess end)) |> Enum.take(4)
 
-          assign(socket,
-            success: "YOU WON!!!",
-            changeset: changeset
-          )
+            params = Map.put(params, "guesses", full_guesses) |> Map.delete("guess")
+            changeset = Puzzle.changeset(changeset, params)
 
-        {_invalid, 4} ->
-          assign(socket,
-            error: "YOU LOSE SUCKER!!!",
-            changeset: changeset
-          )
+            assign(socket,
+              success: "YOU WON!!!",
+              changeset: changeset,
+              form_error: nil
+            )
 
-        _still_playing ->
-          assign(socket, changeset: changeset)
-      end
-      |> store_state()
-      |> tap(fn socket -> IO.inspect(socket.assigns.changeset) end)
+          {_invalid, 4} ->
+            assign(socket,
+              error: "YOU LOSE SUCKER!!!",
+              changeset: changeset,
+              form_error: nil
+            )
 
-    {:noreply, socket}
+          _still_playing ->
+            assign(socket, changeset: changeset, form_error: nil)
+        end
+        |> store_state()
+
+      {:noreply, socket}
+    end
   end
 
   # Pushed from JS hook. Server requests it to send up any

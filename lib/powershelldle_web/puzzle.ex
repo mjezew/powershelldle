@@ -98,7 +98,6 @@ defmodule Puzzle do
           answers
         end
       end)
-      |> IO.inspect()
 
     put_change(changeset, :answers, answers)
   end
