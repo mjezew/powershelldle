@@ -344,8 +344,7 @@ defmodule PowerShelldleWeb.CoreComponents do
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
           "w-3/4 text-zinc-300 bg-transparent focus:ring-0 border-none",
-          "tracking-[.125em] pl-0 py-0 ml-2 mr-16 separated-input",
-          "width: calc(20 * 1.5em - 0.6em)"
+          "tracking-[.125em] pl-0 py-0 ml-2 mr-16"
         ]}
         autocomplete="off"
         spellcheck="false"
