@@ -4,14 +4,14 @@ defmodule Puzzle do
 
   embedded_schema do
     field :hints, {:array, :string}
-    field :answer, {:array, :string}
+    field :answers, {:array, {:array, :string}}
     field :guess, :string
     field :guesses, {:array, :string}
   end
 
   @type t :: %__MODULE__{
           hints: [String.t()],
-          answer: [String.t()],
+          answers: [[String.t()]],
           guess: String.t() | nil,
           guesses: [String.t()]
         }
@@ -21,7 +21,7 @@ defmodule Puzzle do
     command = get_command(params)
 
     user
-    |> cast(params, [:guess, :guesses, :hints, :answer])
+    |> cast(params, [:guess, :guesses, :hints, :answers])
     |> handle_guesses()
     |> derive_hints(command)
     |> derive_answer(command)
@@ -68,19 +68,39 @@ defmodule Puzzle do
 
     guess = List.first(guesses)
 
-    answer =
-      if correct_answer?(guess, command.name) do
-        String.codepoints(command.name)
-      else
-        case step do
-          0 -> init_answer(command.name)
-          1 -> get_verb(command.name)
-          5 -> String.codepoints(command.name)
-          _ -> get_verb_and_first_letter(command.name)
-        end
-      end
+    answers =
+      case step do
+        0 ->
+          [init_answer(command.name)]
 
-    put_change(changeset, :answer, answer)
+        1 ->
+          [init_answer(command.name), get_verb(command.name)]
+
+        5 ->
+          [
+            init_answer(command.name),
+            get_verb(command.name),
+            get_verb_and_first_letter(command.name),
+            String.codepoints(command.name)
+          ]
+
+        _ ->
+          [
+            init_answer(command.name),
+            get_verb(command.name),
+            get_verb_and_first_letter(command.name)
+          ]
+      end
+      |> then(fn answers ->
+        if correct_answer?(guess, command.name) do
+          answers ++ String.codepoints(command.name)
+        else
+          answers
+        end
+      end)
+      |> IO.inspect()
+
+    put_change(changeset, :answers, answers)
   end
 
   defp init_answer(command_name) do
@@ -91,7 +111,7 @@ defmodule Puzzle do
 
   defp update_guesses(nil, ""), do: []
   defp update_guesses(nil, guess), do: [guess]
-  defp update_guesses(guesses, guess), do: [guess | guesses]
+  defp update_guesses(guesses, guess), do: guesses ++ [guess]
 
   defp get_verb(command_name) do
     [verb, noun] = String.split(command_name, "-")
