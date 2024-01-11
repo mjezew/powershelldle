@@ -10,6 +10,15 @@ defmodule PowerShelldleWeb.Index do
   def render(assigns) do
     ~H"""
     <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
+      <div><.ps_label />Write-Host "Puzzle: $puzzle"</div>
+      <div class="flex flex-row items-center mb-6">
+        <p class="whitespace-nowrap pr-3">Puzzle:</p>
+        <div class="flex flex-row items-center">
+          <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5">
+            <%= answer_char %>
+          </div>
+        </div>
+      </div>
       <div><.ps_label />Write-Host "Remaining guesses: $i" -ForegroundColor DarkBlue</div>
       <p class="text-[#3672c0] mb-2">
         Remaining guesses: <%= 5 - (Ecto.Changeset.get_field(@changeset, :guesses, 5) |> length) %>
@@ -45,15 +54,6 @@ defmodule PowerShelldleWeb.Index do
             </div>
           </li>
         </ul>
-      </div>
-      <div><.ps_label />Write-Host "Puzzle: $puzzle"</div>
-      <div class="flex flex-row items-center mb-6">
-        <p class="whitespace-nowrap pr-3">Puzzle:</p>
-        <div class="flex flex-row items-center">
-          <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5">
-            <%= answer_char %>
-          </div>
-        </div>
       </div>
       <div :if={!!@error || @success} class="mt-4">
         <div :if={@error}><.ps_label />Write-Host "<%= @error %>" -ForegroundColor Red</div>
