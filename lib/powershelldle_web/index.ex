@@ -215,7 +215,7 @@ defmodule PowerShelldleWeb.Index do
             changeset = Puzzle.changeset(changeset, params)
 
             assign(socket,
-              error: "YOU LOSE SUCKER!!!",
+              error: "YOU LOSE SUCKER!!! The answer was #{command.name}!!",
               changeset: changeset,
               form_error: nil
             )
