@@ -2,9 +2,9 @@ defmodule PowerShelldleWeb.Index do
   use PowerShelldleWeb, :live_view
   import Phoenix.Component
 
-  alias PowerShelldle.Commands
-
   require Logger
+
+  defp commands, do: Application.get_env(:powershelldle, PowerShelldle.Behaviour.Commands)
 
   @spec render(map) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
@@ -13,14 +13,18 @@ defmodule PowerShelldleWeb.Index do
       <div><.ps_label />Write-Host "Puzzle: $puzzle"</div>
       <div class="flex flex-row items-center mb-6">
         <p class="whitespace-nowrap pr-3">Puzzle:</p>
-        <div class="flex flex-row items-center">
-          <div :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)} class="mr-0.5">
+        <div id="answer" class="flex flex-row items-center">
+          <div
+            :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}
+            id="answer-char"
+            class="mr-0.5"
+          >
             <%= answer_char %>
           </div>
         </div>
       </div>
       <div><.ps_label />Write-Host "Remaining guesses: $i" -ForegroundColor DarkBlue</div>
-      <p class="text-[#3672c0] mb-2">
+      <p id="remaining-guesses" class="text-[#3672c0] mb-2">
         Remaining guesses: <%= 5 - (Ecto.Changeset.get_field(@changeset, :guesses, 5) |> length) %>
       </p>
 
@@ -37,6 +41,7 @@ defmodule PowerShelldleWeb.Index do
           <li>
             <div
               :if={not (Ecto.Changeset.get_field(@changeset, :hints) |> Enum.at(1) |> is_nil())}
+              id="synopsis"
               class="mt-2"
             >
               <p class="font-bold text-zinc-300">SYNOPSIS</p>
@@ -46,7 +51,7 @@ defmodule PowerShelldleWeb.Index do
             </div>
           </li>
           <li>
-            <div class="mt-2">
+            <div id="syntax" class="mt-2">
               <p class="font-bold text-zinc-300">SYNTAX</p>
               <p class="mb-6 ml-10 typewriter">
                 <%= Ecto.Changeset.get_field(@changeset, :hints) |> List.first() %>
@@ -78,7 +83,7 @@ defmodule PowerShelldleWeb.Index do
   @spec mount(map, map, Phoenix.LiveView.Socket.t()) :: {:ok, Phoenix.LiveView.Socket.t()}
   def mount(_params, _session, socket) do
     today = Timex.day(Timex.now())
-    command = Commands.get_by_id(today)
+    command = commands().get_by_id(today)
 
     changeset = Puzzle.changeset(%Puzzle{}, %{command: command, hints: []})
 
@@ -116,6 +121,7 @@ defmodule PowerShelldleWeb.Index do
     guesses = Ecto.Changeset.get_field(changeset, :guesses)
 
     params = Map.put(params, "command", command)
+
     changeset = Puzzle.changeset(changeset, params)
 
     socket =
@@ -158,7 +164,7 @@ defmodule PowerShelldleWeb.Index do
         {:ok, %{id: id, guesses: guesses, error: error, success: success}} ->
           changeset =
             Puzzle.changeset(%Puzzle{}, %{
-              command: Commands.get_by_id(id),
+              command: commands().get_by_id(id),
               guesses: guesses,
               hints: []
             })
