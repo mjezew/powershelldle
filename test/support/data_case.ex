@@ -27,17 +27,11 @@ defmodule PowerShelldle.DataCase do
     end
   end
 
-  setup tags do
-    PowerShelldle.DataCase.setup_sandbox(tags)
-    :ok
-  end
-
   @doc """
   Sets up the sandbox based on the test tags.
   """
-  def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(PowerShelldle.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  def setup_sandbox(_tags) do
+    :ok
   end
 
   @doc """

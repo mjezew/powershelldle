@@ -10,6 +10,8 @@ import Config
 config :powershelldle,
   namespace: PowerShelldle
 
+config :powershelldle, ecto_repos: []
+
 # Configures the endpoint
 config :powershelldle, PowerShelldleWeb.Endpoint,
   url: [host: "localhost"],
@@ -58,6 +60,9 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# default api implementation
+config :powershelldle, PowerShelldle.Behaviour.Commands, PowerShelldle.Commands
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

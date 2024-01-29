@@ -1,4 +1,6 @@
 defmodule PowerShelldle.Commands do
+  @behaviour PowerShelldle.Behaviour.Commands
+
   @type command() :: %{
           name: String.t(),
           description: String.t(),
