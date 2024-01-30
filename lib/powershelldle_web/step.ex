@@ -9,7 +9,7 @@ defmodule Step do
 
   @type t :: %__MODULE__{
           hint: String.t(),
-          answer: [String.t()] 
+          answer: [String.t()]
         }
 
   @spec changeset(%__MODULE__{}, map(), integer, map) :: Ecto.Changeset.t(t())

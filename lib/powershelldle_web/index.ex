@@ -17,7 +17,7 @@ defmodule PowerShelldleWeb.Index do
         <div
           :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}
           id="answer-char"
-          class="mr-0.5 text-xs md:text-2xl"
+          class="mr-0.5 md:text-2xl"
         >
           <%= answer_char %>
         </div>

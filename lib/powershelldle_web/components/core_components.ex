@@ -336,15 +336,15 @@ defmodule PowerShelldleWeb.CoreComponents do
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
     ~H"""
-    <div class="grow" phx-feedback-for={@name}>
+    <div class="grow flex flex-col" phx-feedback-for={@name}>
       <input
         type={@type}
         name={@name}
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "w-3/4 text-zinc-300 bg-transparent border-x-zinc-900 border-t-zinc-900 border-b-zinc-700 ",
-          "tracking-[.125em] pl-0 py-0 ml-2 mr-16"
+          "grow text-zinc-300 bg-transparent border-x-zinc-900 border-t-zinc-900 border-b-zinc-700 ",
+          "tracking-[.125em] p-0 mx-2"
         ]}
         autocomplete="off"
         spellcheck="false"
