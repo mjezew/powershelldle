@@ -2223,4 +2223,8 @@ defmodule PowerShelldle.Commands do
   def get_longest do
     Enum.sort_by(@commands, &String.length(&1.name)) |> Enum.reverse() |> hd()
   end
+
+  def get_example do
+    Enum.find(@commands, fn e -> e.name == "Write-Host" end)
+  end
 end

@@ -91,6 +91,38 @@ defmodule PowerShelldleWeb.IndexTest do
     assert live |> element("div", "YOU LOSE SUCKER!!!") |> has_element?()
   end
 
+  test "help modal opens", %{conn: conn} do
+    conn = get(conn, ~p"/")
+    {:ok, live, _html} = live(conn)
+
+    assert live |> element("p#remaining-guesses", "Remaining guesses: 5") |> has_element?()
+
+    live
+    |> element("button#help-button")
+    |> render_click()
+
+    assert live |> element("h3", "How to play Powershelldle") |> has_element?()
+  end
+
+  test "help modal closes", %{conn: conn} do
+    conn = get(conn, ~p"/")
+    {:ok, live, _html} = live(conn)
+
+    assert live |> element("p#remaining-guesses", "Remaining guesses: 5") |> has_element?()
+
+    live
+    |> element("button#help-button")
+    |> render_click()
+
+    assert live |> element("h3", "How to play Powershelldle") |> has_element?()
+
+    live
+    |> element("button#close-button")
+    |> render_click()
+
+    refute live |> element("h3", "How to play Powershelldle") |> has_element?()
+  end
+
   def command_answer(0) do
     Enum.reduce(String.codepoints(@command.name), "", fn graph, acc ->
       new_char = if graph == "-", do: "-", else: "_"

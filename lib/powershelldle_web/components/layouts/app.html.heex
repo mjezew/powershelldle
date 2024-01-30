@@ -1,6 +1,11 @@
 <header class="px-4 sm:px-6 lg:px-8 mt-8 flex">
-  <div class="mx-auto w-[42rem]">
-    <img src={~p"/images/powershelldle_optimized.svg"} width="360" />
+  <div class="mx-auto w-[42rem] flex items-center justify-between">
+    <img src={~p"/images/powershelldle_optimized.svg"} class=" w-56 md:w-80" />
+    <button phx-click="help_open" class="mx-4" id="help-button">
+      <span class="material-symbols-outlined">
+        help
+      </span>
+    </button>
   </div>
 </header>
 <main class="px-4 py-20 sm:px-6 lg:px-8">

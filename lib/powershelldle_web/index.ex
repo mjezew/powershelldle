@@ -9,10 +9,82 @@ defmodule PowerShelldleWeb.Index do
   @spec render(map) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
+    <div :if={@help_open?}>
+      <div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Background backdrop -->
+        <div class="fixed inset-0 bg-zinc-700 bg-opacity-75 transition-opacity"></div>
+
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <!--
+        Modal panel, show/hide based on modal state.
+
+        Entering: "ease-out duration-300"
+          From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          To: "opacity-100 translate-y-0 sm:scale-100"
+        Leaving: "ease-in duration-200"
+          From: "opacity-100 translate-y-0 sm:scale-100"
+          To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      -->
+            <div class="relative transform overflow-hidden rounded-lg bg-zinc-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div class="bg-zinc-900 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                  <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <div class="flex flex-row justify-between items-center">
+                      <h3 class="text-base font-semibold leading-6 text-zinc-300" id="modal-title">
+                        How to play Powershelldle
+                      </h3>
+                      <button phx-click="help_close" id="close-button">
+                        <span class="material-symbols-outlined">
+                          close
+                        </span>
+                      </button>
+                    </div>
+                    <div class="mt-2">
+                      <p class="text-sm text-gray-500">
+                        Guess the PowerShell cmdlet! You have 5 attempts to guess the correct cmdlet.
+                        After each guess, you'll receive various hints to help you get the answer.
+                        There will be a new puzzle every day! Can you decipher the cmdlet and master PowerShell vocabulary?
+                      </p>
+                      <h4 class="text-base font-semibold text-zinc-400 text-sm mt-8">Hint info:</h4>
+                      <ol class="list-decimal pl-8 mt-2 space-y-2">
+                        <li class="text-sm text-gray-500">
+                          The first hint will be the verb of the commandlet. For example if the answer is "<%= commands().get_example().name %>",
+                          the hint will be "<%= String.split(commands().get_example().name, "-")
+                          |> List.first() %>" and will fill in the puzzle at the top.
+                        </li>
+                        <li class="text-sm text-gray-500">
+                          The second hint will be the first letter of the second part of the commandlet. For example if the answer is "Write-Host",
+                          the hint will be "<%= String.split(commands().get_example().name, "-")
+                          |> List.last()
+                          |> String.codepoints()
+                          |> List.first() %>" and will fill in the puzzle at the top.
+                        </li>
+                        <li class="text-sm text-gray-500">
+                          The third hint will be the syntax parameters for the commandlet. For example if the answer is "Write-Host",
+                          the hint will be:
+                          "<code class="mt-8">
+                            <%= commands().get_example().params %>
+                          </code>"
+                        </li>
+                        <li class="text-sm text-gray-500">
+                          The fourth and final hint will be the description of the commandlet. For example if the answer is "Write-Host",
+                          the hint will be "<%= commands().get_example().description %>"
+                        </li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
       <div
         id="answer"
-        class={"flex flex-row justify-center items-center border border-zinc-700 rounded p-4 relative mb-4 w-full h-16 ping-chillin-before #{if @flashing, do: "ping-chillin", else: ""}"}
+        class={"flex flex-row justify-center items-center border border-zinc-700 rounded p-4 relative mb-4 w-full h-16 ping-chillin-before #{if @flashing?, do: "ping-chillin", else: ""}"}
       >
         <div
           :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}
@@ -123,7 +195,8 @@ defmodule PowerShelldleWeb.Index do
        command: command,
        error: nil,
        success: nil,
-       flashing: false,
+       flashing?: false,
+       help_open?: false,
        id: today
      )}
   end
@@ -166,7 +239,7 @@ defmodule PowerShelldleWeb.Index do
             Process.send_after(self(), :stop_flashing, 300)
 
             assign(socket,
-              flashing: true
+              flashing?: true
             )
           else
             socket
@@ -212,8 +285,21 @@ defmodule PowerShelldleWeb.Index do
     {:noreply, socket}
   end
 
+  def handle_event("help_open", _, socket) do
+    Logger.debug("open")
+    socket = assign(socket, help_open?: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("help_close", _, socket) do
+    Logger.debug("close")
+    socket = assign(socket, help_open?: false)
+    {:noreply, socket}
+  end
+
   def handle_info(:stop_flashing, socket) do
-    socket = assign(socket, flashing: false)
+    socket = assign(socket, flashing?: false)
 
     {:noreply, socket}
   end
