@@ -2225,4 +2225,8 @@ defmodule PowerShelldle.Commands do
   def get_by_id(id) do
     @commands_by_id[id]
   end
+
+  def get_longest do
+    Enum.sort_by(@commands, &String.length(&1.name)) |> Enum.reverse() |> hd()
+  end
 end

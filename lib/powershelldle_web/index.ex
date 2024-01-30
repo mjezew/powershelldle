@@ -10,21 +10,20 @@ defmodule PowerShelldleWeb.Index do
   def render(assigns) do
     ~H"""
     <.form :let={f} for={@changeset} id="powerform" phx-submit="submit_guess" phx-hook="LocalStorage">
-      <div><.ps_label />Write-Host "Puzzle: $puzzle"</div>
-      <div class="flex flex-row items-center mb-6">
-        <p class="whitespace-nowrap pr-3">Puzzle:</p>
-        <div id="answer" class="flex flex-row items-center">
-          <div
-            :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}
-            id="answer-char"
-            class="mr-0.5"
-          >
-            <%= answer_char %>
-          </div>
+      <div
+        id="answer"
+        class={"flex flex-row justify-center items-center border border-zinc-700 rounded p-4 relative mb-4 w-full h-16 ping-chillin-before #{if @flashing, do: "ping-chillin", else: ""}"}
+      >
+        <div
+          :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}
+          id="answer-char"
+          class="mr-0.5 text-xs md:text-2xl"
+        >
+          <%= answer_char %>
         </div>
       </div>
       <div><.ps_label />Write-Host "Remaining guesses: $i" -ForegroundColor DarkBlue</div>
-      <p id="remaining-guesses" class="text-[#3672c0] mb-2">
+      <p id="remaining-guesses" class="text-[#3672c0] mb-4">
         Remaining guesses: <%= 5 - (Ecto.Changeset.get_field(@changeset, :guesses, 5) |> length) %>
       </p>
 
@@ -107,6 +106,7 @@ defmodule PowerShelldleWeb.Index do
        command: command,
        error: nil,
        success: nil,
+       flashing: false,
        id: today
      )}
   end
@@ -145,7 +145,16 @@ defmodule PowerShelldleWeb.Index do
           )
 
         _still_playing ->
-          assign(socket, changeset: changeset)
+          if length(guesses) in [0, 1] do
+            Process.send_after(self(), :stop_flashing, 300)
+
+            assign(socket,
+              flashing: true
+            )
+          else
+            socket
+          end
+          |> assign(changeset: changeset)
       end
       |> store_state()
 
@@ -181,9 +190,14 @@ defmodule PowerShelldleWeb.Index do
     {:noreply, socket}
   end
 
-  def handle_event("restorePuzzle", _token_data, socket) do
-    # No expected token data received from the client
+  def handle_event("restorePuzzle", _puzzle_data, socket) do
     Logger.debug("No LiveView SessionStorage state to restore")
+    {:noreply, socket}
+  end
+
+  def handle_info(:stop_flashing, socket) do
+    socket = assign(socket, flashing: false)
+
     {:noreply, socket}
   end
 
