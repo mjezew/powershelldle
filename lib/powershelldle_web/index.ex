@@ -71,8 +71,26 @@ defmodule PowerShelldleWeb.Index do
         <.ps_label />Read-Host -Prompt "Guess" -OutVariable guess
         <div class="flex flex-row items-center">
           <label for="guess">Guess:</label>
-
-          <.input type="text" id="guess" field={f[:guess]} disabled={!!@error || !!@success} />
+          <div class="relative flex">
+            <div class={[
+              "absolute z-0 flex flex-row border border-transparent text-zinc-400 tracking-[.125em] p-0 mx-2 -bottom-1"
+            ]}>
+              <div
+                :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}
+                id="answer-char"
+                class={(answer_char == "-" && "relative bottom-1") || ""}
+              >
+                <%= (answer_char == "-" && "-") || "_" %>
+              </div>
+            </div>
+            <.input
+              type="text"
+              maxlength={length(Ecto.Changeset.get_field(@changeset, :answer))}
+              id="guess"
+              field={f[:guess]}
+              disabled={!!@error || !!@success}
+            />
+          </div>
         </div>
       </div>
     </.form>

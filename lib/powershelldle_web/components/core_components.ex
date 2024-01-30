@@ -343,8 +343,8 @@ defmodule PowerShelldleWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "grow text-zinc-300 bg-transparent border-x-zinc-900 border-t-zinc-900 border-b-zinc-700 ",
-          "tracking-[.125em] p-0 mx-2"
+          "grow text-zinc-300 bg-transparent border-transparent ",
+          "tracking-[.125em] p-0 mx-2 z-10"
         ]}
         autocomplete="off"
         spellcheck="false"
