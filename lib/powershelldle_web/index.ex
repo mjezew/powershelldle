@@ -68,12 +68,11 @@ defmodule PowerShelldleWeb.Index do
         <p>Come back tomorrow for a new puzzle!</p>
       </div>
       <div :if={!@error and !@success}>
-        <.ps_label />Read-Host -Prompt "Guess" -OutVariable guess
+        <.ps_label />Read-Host -OutVariable guess
         <div class="flex flex-row items-center">
-          <label for="guess">Guess:</label>
-          <div class="relative flex">
+          <div class="relative flex grow">
             <div class={[
-              "absolute z-0 flex flex-row border border-transparent text-zinc-400 tracking-[.125em] p-0 mx-2 -bottom-1"
+              "absolute z-0 flex flex-row border border-transparent text-zinc-400 tracking-[.125em] p-0 -bottom-1"
             ]}>
               <div
                 :for={answer_char <- Ecto.Changeset.get_field(@changeset, :answer)}

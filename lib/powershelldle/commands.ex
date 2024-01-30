@@ -1291,12 +1291,6 @@ defmodule PowerShelldle.Commands do
         "[-ReferenceObject*] <PSObject[]> [-DifferenceObject*] <PSObject[]> [-CaseSensitive] [-Culture<String>] [-ExcludeDifferent] [-IncludeEqual] [-PassThru] [-Property <Object[]>] [-SyncWindow <Int32>][<CommonParameters>]"
     },
     %{
-      description: "Applies LCM settings to nodes.",
-      name: "Set-DscLocalConfigurationManager",
-      params:
-        "[-Path*] <String> -CimSession* <CimSession[]> [-Confirm] [-Force] [-ThrottleLimit<Int32>] [-WhatIf] [<CommonParameters>]"
-    },
-    %{
       description: "Adds a VPN connection to the Connection Manager phone book.",
       name: "Add-VpnConnection",
       params:
