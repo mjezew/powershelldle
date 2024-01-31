@@ -30,7 +30,7 @@ defmodule Puzzle do
   def correct_answer?(nil, _command_name), do: false
 
   def correct_answer?(guess, command_name),
-    do: String.downcase(guess) == String.downcase(command_name)
+    do: String.downcase(guess) |> String.replace(" ", "-") == String.downcase(command_name)
 
   defp handle_guesses(changeset) do
     guess = get_field(changeset, :guess)

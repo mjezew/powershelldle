@@ -13,6 +13,7 @@ defmodule PowerShelldleWeb.IndexTest do
   setup do
     CommandsMock
     |> stub(:get_by_id, fn _id -> @command end)
+    |> stub(:get_example, fn -> @command end)
 
     :ok
   end
@@ -121,6 +122,20 @@ defmodule PowerShelldleWeb.IndexTest do
     |> render_click()
 
     refute live |> element("h3", "How to play Powershelldle") |> has_element?()
+  end
+
+  test "success on space instead of hyphen", %{conn: conn} do
+    conn = get(conn, ~p"/")
+    {:ok, live, _html} = live(conn)
+
+    assert live |> element("p#remaining-guesses", "Remaining guesses: 5") |> has_element?()
+
+    assert live
+           |> element("form#powerform")
+           |> render_submit(%{"puzzle" => %{"guess" => @command.name |> String.replace("-", " ")}})
+
+    assert live |> element("p#remaining-guesses", "Remaining guesses: 0") |> has_element?()
+    assert live |> element("div", "YOU WON!!!") |> has_element?()
   end
 
   def command_answer(0) do
