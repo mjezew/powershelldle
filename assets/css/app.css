@@ -1,14 +1,12 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-
-/* This file is for your main application CSS */
-
-html {
-  font-family: 'IBM Plex Mono', monospace;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "https://www.nerdfonts.com/assets/css/webfont.css"
+  /* This file is for your main application CSS */ html {
+  font-family: "IBM Plex Mono", monospace;
 }
 
-[type='text']:focus {
+[type="text"]:focus {
   outline-offset: 0px;
   border-top-color: transparent;
   border-left-color: transparent;
@@ -23,7 +21,7 @@ html {
 }
 
 .ping-chillin-before::before {
-  content: ' ';
+  content: " ";
   display: block;
   position: absolute;
   top: 0;
