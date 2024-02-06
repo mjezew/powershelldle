@@ -1,8 +1,8 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-@import "https://www.nerdfonts.com/assets/css/webfont.css"
-  /* This file is for your main application CSS */ html {
+/* This file is for your main application CSS */
+html {
   font-family: "IBM Plex Mono", monospace;
 }
 
