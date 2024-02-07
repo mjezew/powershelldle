@@ -46,7 +46,7 @@ defmodule PowerShelldle.Commands do
         "Converts objects into a series of comma-separated value (CSV) variable-length strings.",
       name: "ConvertTo-Csv",
       params:
-        "ConvertTo-Csv [-InputObject*] <PSObject> [[-Delimiter] <Char>] [-NoTypeInformation] [<CommonParameters>]"
+        "[-InputObject*] <PSObject> [[-Delimiter] <Char>] [-NoTypeInformation] [<CommonParameters>]"
     },
     %{
       description:
@@ -243,7 +243,7 @@ defmodule PowerShelldle.Commands do
       description: "Sorts objects by property values.",
       name: "Sort-Object",
       params:
-        "Sort-Object [[-Property] <Object[]>] [-CaseSensitive] [-Culture <String>] [-Descending] [-InputObject <PSObject>][-Unique] [<CommonParameters>]"
+        "[[-Property] <Object[]>] [-CaseSensitive] [-Culture <String>] [-Descending] [-InputObject <PSObject>][-Unique] [<CommonParameters>]"
     },
     %{
       description: "Creates a new scheduled task settings object.",
@@ -1507,7 +1507,7 @@ defmodule PowerShelldle.Commands do
         "Gets a list of all PhysicalDisk objects visible across any available Storage Management Providers, or optionally afiltered list.",
       name: "Get-PhysicalDisk",
       params:
-        "[-CanPool] [-CimSession <CimSession>] [-Description <String>] [-HealthStatus<Get-PhysicalDisk.PhysicalDiskHealthStatus>] [-Manufacturer <String>] [-Model <String>] [-UniqueId <String>][-Usage <Get-PhysicalDisk.PhysicalDiskUsage>] [<CommonParameters>]"
+        "[-CanPool] [-CimSession <CimSession>] [-Description <String>] [-HealthStatus<PhysicalDiskHealthStatus>] [-Manufacturer <String>] [-Model <String>] [-UniqueId <String>][-Usage <PhysicalDiskUsage>] [<CommonParameters>]"
     },
     %{
       description:
@@ -1800,7 +1800,7 @@ defmodule PowerShelldle.Commands do
       description: "Sorts objects by property values.",
       name: "Sort-Object",
       params:
-        "Sort-Object [[-Property] <Object[]>] [-CaseSensitive] [-Culture <String>] [-Descending] [-InputObject <PSObject>][-Unique] [<CommonParameters>]"
+        "[[-Property] <Object[]>] [-CaseSensitive] [-Culture <String>] [-Descending] [-InputObject <PSObject>][-Unique] [<CommonParameters>]"
     },
     %{
       description: "Gets the list of cipher suites for TLS for a computer.",
@@ -2064,7 +2064,7 @@ defmodule PowerShelldle.Commands do
       description: "Creates a volume with the specified file system.",
       name: "New-Volume",
       params:
-        "[-StoragePool*] <CimInstance> [-AccessPath <String>] [-AllocationUnitSize <UInt32>] [-CimSession<CimSession>] [-DriveLetter <Char>] [-FileSystem <FileSystemType>] [-MediaType <New-Volume.MediaType>][-NumberOfColumns <UInt16>] [-NumberOfGroups <UInt16>] [-PhysicalDiskRedundancy <UInt16>] [-ProvisioningType<Microsoft.PowerShell.Cmdletization.GeneratedTypes.SetStoragePool.ProvisioningType>] [-ReadCacheSize <UInt64>][-ResiliencySettingName <String>] [-Size <UInt64>] [-StorageTierFriendlyNames <String[]>] [-StorageTiers<CimInstance[]>] [-StorageTierSizes <UInt64[]>] [-ThrottleLimit <Int32>] [-UseMaximumSize] [-WriteCacheSize<UInt64>] -FriendlyName* <String> [<CommonParameters>]"
+        "[-StoragePool*] <CimInstance> [-AccessPath <String>] [-AllocationUnitSize <UInt32>] [-CimSession<CimSession>] [-DriveLetter <Char>] [-FileSystem <FileSystemType>] [-MediaType <MediaType>][-NumberOfColumns <UInt16>] [-NumberOfGroups <UInt16>] [-PhysicalDiskRedundancy <UInt16>] [-ProvisioningType<Microsoft.PowerShell.Cmdletization.GeneratedTypes.SetStoragePool.ProvisioningType>] [-ReadCacheSize <UInt64>][-ResiliencySettingName <String>] [-Size <UInt64>] [-StorageTierFriendlyNames <String[]>] [-StorageTiers<CimInstance[]>] [-StorageTierSizes <UInt64[]>] [-ThrottleLimit <Int32>] [-UseMaximumSize] [-WriteCacheSize<UInt64>] -FriendlyName* <String> [<CommonParameters>]"
     },
     %{
       description:
